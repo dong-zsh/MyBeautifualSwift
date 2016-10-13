@@ -20,6 +20,8 @@ class Top8CategoryDetailViewController: BaseViewController,UICollectionViewDataS
     let CELL_INTERVAL:CGFloat = 5.0
     let count:Int = 20
     var cursor:Int = 0
+    var headerRefresh:Bool = false
+    
     var dataSourceArray:NSMutableArray?
     
     var keyword:String?
@@ -34,8 +36,21 @@ class Top8CategoryDetailViewController: BaseViewController,UICollectionViewDataS
         categoryCollectionView.dataSource = self
         categoryCollectionView.delegate = self
         dataSourceArray = NSMutableArray()
+        self.categoryCollectionView.mj_header = MJRefreshNormalHeader(refreshingTarget: self, refreshingAction:#selector(Top8CategoryDetailViewController.headRefresh))
+        self.categoryCollectionView.mj_footer = MJRefreshBackNormalFooter(refreshingTarget: self, refreshingAction:#selector(Top8CategoryDetailViewController.refreshMoreData))
         self.downLoadData()
+        self.categoryCollectionView.mj_header.beginRefreshing()
         // Do any additional setup after loading the view.
+    }
+    //MARK: - 上拉刷新
+    func headRefresh() {
+        self.headerRefresh = true
+        self.downLoadData()
+    }
+    //MARK: - 下拉加载更多
+    func refreshMoreData() {
+        self.cursor += 1
+        self.downLoadData()
     }
 
     override func didReceiveMemoryWarning() {
@@ -92,7 +107,15 @@ class Top8CategoryDetailViewController: BaseViewController,UICollectionViewDataS
         parameters["cursor"] = cursor as AnyObject?
         
         DownLoadData.getCategoryDetail(parameters) { (array) in
-            self.dataSourceArray?.addObjects(from: array as! Array<ProductModel>)
+            if self.headerRefresh == true {
+                self.dataSourceArray?.removeAllObjects()
+                self.dataSourceArray?.addObjects(from: array as! Array<ProductModel>)
+                self.headerRefresh = false
+            }else{
+                self.dataSourceArray?.addObjects(from: array as! Array<ProductModel>)
+            }
+            self.categoryCollectionView.mj_header.endRefreshing()
+            self.categoryCollectionView.mj_footer.endRefreshing()
             self.categoryCollectionView.reloadData()
         }
         

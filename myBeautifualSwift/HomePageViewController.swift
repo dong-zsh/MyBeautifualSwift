@@ -13,10 +13,13 @@ class HomePageViewController: BaseViewController ,UICollectionViewDelegateFlowLa
     let CELL_INTERVAL:CGFloat = 12.0
     var cursor:Int = 0
     let count:Int = 20
-
+    var headRefresh:Bool = false
+    
+    
     let adCellID = "ADcell"
     let categoryCell = "categoryCell"
     let projectDetailCell = "projectDetailCell"
+    
     
     @IBOutlet weak var baseCollectionView: UICollectionView!
     var adURLStringArr:Array<String> = []
@@ -27,15 +30,29 @@ class HomePageViewController: BaseViewController ,UICollectionViewDelegateFlowLa
     override func viewDidLoad() {
         super.viewDidLoad()
         self.automaticallyAdjustsScrollViewInsets = false
+        
+        self.baseCollectionView.mj_header = MJRefreshNormalHeader(refreshingTarget:self, refreshingAction:#selector(HomePageViewController.refreshData))
+        self.baseCollectionView.mj_footer = MJRefreshBackNormalFooter(refreshingTarget:self, refreshingAction:#selector(HomePageViewController.footRefresh))
+        
         self.title = "美丽衣橱"
-        self.downloadADData()
-        self.downloadCategoryData()
         self.setUpData()
-        self.downloadProductData()
         
     }
     func setUpData() {
         productsNSMArray = NSMutableArray()
+        self.baseCollectionView.mj_header.beginRefreshing()
+        self.downloadADData()
+        self.downloadCategoryData()
+        self.downloadProductData()
+    }
+    func refreshData() {
+        cursor = 0
+        headRefresh = true
+        self.downloadProductData()
+    }
+    func footRefresh() {
+        cursor += 1
+        self.downloadProductData()
     }
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
@@ -132,7 +149,16 @@ class HomePageViewController: BaseViewController ,UICollectionViewDelegateFlowLa
     //MARK: - 下载产品数据
     private func downloadProductData() {
         DownLoadData.getProducts(["cursor":cursor as AnyObject,"count":count as AnyObject]){ array in
-            self.productsNSMArray?.addObjects(from: array as! [ProductModel])
+            
+            if self.headRefresh == true {
+                self.productsNSMArray?.removeAllObjects()
+                self.productsNSMArray?.addObjects(from: array as! [ProductModel])
+                self.headRefresh = false
+            }else{
+                 self.productsNSMArray?.addObjects(from: array as! [ProductModel])
+            }
+            self.baseCollectionView.mj_header.endRefreshing()
+            self.baseCollectionView.mj_footer.endRefreshing()
             self.baseCollectionView.reloadSections(NSIndexSet(index:2) as IndexSet)
         
         }
@@ -150,7 +176,6 @@ class HomePageViewController: BaseViewController ,UICollectionViewDelegateFlowLa
                 let ProductDetailViewController = segue.destination as! ProductDetailViewController
                 ProductDetailViewController.urlString = model.taobao_url
             }
-            
         }
     }
 

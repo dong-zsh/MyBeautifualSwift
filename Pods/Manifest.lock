@@ -1,6 +1,7 @@
 PODS:
   - Alamofire (4.0.0)
   - MJExtension (3.0.13)
+  - MJRefresh (3.1.12)
   - SDWebImage (3.8.2):
     - SDWebImage/Core (= 3.8.2)
   - SDWebImage/Core (3.8.2)
@@ -8,13 +9,15 @@ PODS:
 DEPENDENCIES:
   - Alamofire (~> 4.0.0)
   - MJExtension (~> 3.0.13)
+  - MJRefresh (~> 3.1.12)
   - SDWebImage (~> 3.8.2)
 
 SPEC CHECKSUMS:
   Alamofire: fef59f00388f267e52d9b432aa5d93dc97190f14
   MJExtension: 5932755f451458eefa24239358817f8d291240c7
+  MJRefresh: b96cdb21c4aa75a7b07654311ab2f315c497e806
   SDWebImage: 098e97e6176540799c27e804c96653ee0833d13c
 
-PODFILE CHECKSUM: 3b8ecf65f71717bc800102e1945c9859c1cea23e
+PODFILE CHECKSUM: e3902fe9b66bcc5711f840a88322273ae27d21ba
 
 COCOAPODS: 1.1.0.beta.2
