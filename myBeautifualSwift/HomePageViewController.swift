@@ -29,6 +29,8 @@ class HomePageViewController: BaseViewController ,UICollectionViewDelegateFlowLa
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        Thread.sleep(forTimeInterval: 3.0)//延长启动页的显示时间
+        
         self.automaticallyAdjustsScrollViewInsets = false
         
         self.baseCollectionView.mj_header = MJRefreshNormalHeader(refreshingTarget:self, refreshingAction:#selector(HomePageViewController.refreshData))
